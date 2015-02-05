@@ -34,6 +34,8 @@ for line in f:
     new_data['lat'] = t['lat']
     new_data['lon'] = t['lon']
     
-    print new_data
+    print json.dumps(new_data)
+
+    #print new_data
 
     #print t['time'] + time_offset, ',', t['imei'], ',', t['lat'] + lat_offset, ',', t['lon'] + lon_offset
