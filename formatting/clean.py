@@ -1,3 +1,5 @@
+#!/usr/bin/python
+
 import json
 import datetime
 import os
@@ -35,12 +37,12 @@ for line in f:
     new_data['lat'] = t['lat']
     new_data['lon'] = t['lon']
     
-    filename = './data/' + str(new_data['imei']) + '_' + str(new_data['day_number'])  + '.txt'
+    filename = '../data/' + str(new_data['imei']) + '_' + str(new_data['day_number'])  + '.txt'
     if os.path.isfile(filename):
         # append to file
         os.system('echo \'' + json.dumps(new_data) + '\' >> ' + filename)
     else:
-        os.system('echo \'' + str(new_data) + '\' > ' + filename)
+        os.system('echo \'' + json.dumps(new_data) + '\' > ' + filename)
         # create a new file and write 
  
     #print new_data

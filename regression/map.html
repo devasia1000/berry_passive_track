@@ -1,4 +1,7 @@
 <html>
+
+  <script src="regression.min.js"></script>
+
   <head>
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no">
     <meta charset="utf-8">
@@ -17,13 +20,45 @@
     <script src="https://maps.googleapis.com/maps/api/js?v=3.exp&signed_in=true"></script>
     <script>
 
+var map;
+
 function initialize() {
+
+/*
+  var data = [
+
+				[-10, -738],
+				[-9, -520],
+				[-8, -350],
+				[-7, -222],
+				[-6, -130],
+				[-5, -68],
+				[-4, -30],
+				[-3, -10],
+				[-2, -2],
+				[-1, 0],
+				[0, 2],
+				[1, 10],
+				[2, 30],
+				[3, 68],
+				[4, 130],
+				[5, 222],
+				[6, 350],
+				[7, 520],
+				[8, 738],
+				[9, 1010]
+               ];
+
+  var myRegression = regression('polynomial', data, 3);
+  alert(myRegression.points);
+*/
+
   var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
   var mapOptions = {
     zoom: 4,
     center: myLatlng
   }
-  var map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
+  map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
   var marker = new google.maps.Marker({
       position: myLatlng,
@@ -34,8 +69,6 @@ function initialize() {
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
-
-var data_list = []
 
 function readSingleFile(evt) {
     //Retrieve the first (and only!) File from the FileList object
@@ -48,7 +81,13 @@ function readSingleFile(evt) {
         var lines = contents.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
           for(var i = 0; i < lines.length; i++) {
             var data = JSON.parse(lines[i]);
-            data_list.push(data);
+           
+/*            var myLatlng = new google.maps.LatLng(data['lat'], data['lon']);
+            var marker = new google.maps.Marker({
+                position: myLatlng,
+                map: map,
+                title: 'Point'
+            });*/
           }
       }
       r.readAsText(f);
@@ -56,7 +95,6 @@ function readSingleFile(evt) {
       alert("Failed to load file");
     }
 
-    console.log(data_list);
   }
 
   document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
