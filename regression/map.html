@@ -56,7 +56,8 @@ function initialize() {
   var myLatlng = new google.maps.LatLng(-25.363882,131.044922);
   var mapOptions = {
     zoom: 4,
-    center: myLatlng
+    center: myLatlng,
+    mapTypeId: google.maps.MapTypeId.SATELLITE
   }
   map = new google.maps.Map(document.getElementById('map-canvas'), mapOptions);
 
@@ -69,32 +70,79 @@ function initialize() {
 
 google.maps.event.addDomListener(window, 'load', initialize);
 
+function processData(data_list, small_lat, big_lat) {
+
+  var result_points = regression('linear', data_list).points;
+
+  var flightPlanCoordinates = [];
+  for (var i=0 ; i<result_points.length ; i++) {
+    flightPlanCoordinates.push(new google.maps.LatLng(result_points[i][1], result_points[i][0]));
+  }
+
+  var flightPath = new google.maps.Polyline({
+    path: flightPlanCoordinates,
+    geodesic: true,
+    strokeColor: '#000000',
+    strokeOpacity: 1.0,
+    strokeWeight: 2
+  });
+
+  flightPath.setMap(map);
+
+}
 
 function readSingleFile(evt) {
+
     //Retrieve the first (and only!) File from the FileList object
     var f = evt.target.files[0]; 
+    var data_list = [];
+
+    var small_lat, big_lat;
 
     if (f) {
       var r = new FileReader();
+
       r.onload = function(e) {
+
         var contents = e.target.result;
         var lines = contents.split(/[\r\n]+/g); // tolerate both Windows and Unix linebreaks
-          for(var i = 0; i < lines.length; i++) {
-            var data = JSON.parse(lines[i]);
-           
-/*            var myLatlng = new google.maps.LatLng(data['lat'], data['lon']);
-            var marker = new google.maps.Marker({
-                position: myLatlng,
-                map: map,
-                title: 'Point'
-            });*/
+        var marker;
+        
+        for(var i = 0; i < lines.length-1; i++) {
+
+          var data = JSON.parse(lines[i]);
+
+          var el = [];
+          el.push(data['lon']);
+          el.push(data['lat']);
+
+          if (i == 0) {
+            small_lat = data['lat'];
           }
+          big_lat = data['lat'];
+
+          data_list.push(el);
+
+          if (i%100 == 0) {
+
+          var myLatlng = new google.maps.LatLng(data['lat'], data['lon']);
+          marker = new google.maps.Marker({
+            position: myLatlng,
+            map: map,
+            title: 'Point'
+          });
+        }
       }
+
+        map.panTo(marker.getPosition());
+        processData(data_list, small_lat, big_lat);
+      }
+
       r.readAsText(f);
+
     } else { 
       alert("Failed to load file");
     }
-
   }
 
   document.getElementById('fileinput').addEventListener('change', readSingleFile, false);
